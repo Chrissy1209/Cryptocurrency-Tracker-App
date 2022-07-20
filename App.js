@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, Text, View, FlatList, SafeAreaView, Image, ActivityIndicator } from 'react-native';
+import _ from 'lodash'
 
 export default function App() {
   const [coins, setCoins] = useState([]);
@@ -12,39 +13,46 @@ export default function App() {
   useEffect(() => {
     console.log("myRefreshing = " + myRefreshing)
     console.log("------------page = "+ page +"---------------")
-    getCoinsAPIbyMarketCap(page);
+    // const finalPage = myRefreshing ? 1 : page;
+    // setMyLoading ? getCoinsAPI(order, page) : getCoinsAPI("market_cap_desc", 1)
   }, [page]);
 
-  const getCoinsAPIbyMarketCap = async (p) => {
-    // try {
-    //   const res = await fetch(
-    //     // "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
-    //     "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false"
-    //   );  
-    //   const data = await res.json();
-    //   // setCoins(data['bitcoin']['usd']);
-    //   console.log(data)
-    // } catch (error){
-    //   console.error(error)
-    // }
-    return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${PER_PAGE}&page=${p}`)
+  const getCoinsAPI = async (ord, p) => {
+    return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=${ord}&per_page=${PER_PAGE}&page=${p}`)
       .then((response) => response.json())
       .then((myList) => {
+        console.log("p="+p)
+        console.log(myList.map(item => item.symbol));
         console.log("myList.length = " + myList.length)
-        setPER_PAGE(myList.length)
-        if(PER_PAGE < 25) setEnableLoad(false)
+        console.log("myRefreshing = " + myRefreshing)
+        if(myList.length < 25) setEnableLoad(false)
 
-        if(myRefreshing) setCoins(myList)
-        else {
+        if(myRefreshing) {
+          // setCoins(myList)
+
+          // const mySet = new Set(coins)
+          // console.log("mySet = " + mySet)
+          // mySet.add(myList)
+          // setCoins(Array.from(mySet))
+          setCoins([])
+          setCoins(myList)
+          // setCoins(() => {
+          //   let test = _.uniq(myList)
+          //   return test
+          // })
+
+          // let test = coins
+          // test = _.uniq(myList)
+          // setCoins(test)
+
+        } else {
           setCoins((preData) => {
             // return [...preData, ...myList]
             return preData.concat(myList)
           })
         }
-
         setMyRefreshing(false)
         setMyLoading(false)
-        console.log("Refreshing")
       })
       .catch((error) => {
         console.error(error);
@@ -65,7 +73,7 @@ export default function App() {
       </View>
       <View style={{alignItems: 'flex-end', justifyContent: 'center'}}>
         <Text style={styles.coinPrice}>US${item.current_price}</Text>
-        {/* <Text>{item.market_cap}</Text> */}
+        <Text>${item.total_volume}</Text>
       </View>
     </View>
   )
@@ -89,22 +97,32 @@ export default function App() {
   const handleRefreah = () => {
     setMyRefreshing(true)
     if(page!=1) setPage(1)
-    else getCoinsAPIbyMarketCap(page)
+    else getCoinsAPI(order, 1)
   }
+
   const handleLoad = () => {
-    if(enableLoad && !myLoading) setPage(page+1)
     setMyLoading(true)
+    if(enableLoad && !myLoading) setPage(page+1)
   }
+
   const handlePress = (e) => {
-    if(e=="Name") {
-      setOrder('Name')
-      // setPage(1)
-      // getCoinsAPIbyMarketCapbyName(page)
-    } else if(e=="Price") {
-      setOrder('Price')
+    if(e=="id_desc") {
+      setOrder('id_desc')
+
+      setMyRefreshing(true)// <------------
+      console.log(myRefreshing)
+      getCoinsAPI("id_desc", 1)
+    } else if(e=="gecko_desc") {
+      setOrder('gecko_desc')
+
+      setMyRefreshing(true)// <------------
+      console.log(myRefreshing)
+      getCoinsAPI("gecko_desc", 1)
     } else {
-      setOrder("None")
+      setOrder("Volume_desc")
+
     }
+
     console.log(e) 
   }
 
@@ -117,14 +135,14 @@ export default function App() {
           <Text style={styles.title}>Cryptocurrencies</Text>
         </View>
         <View style={{flexDirection: "row", alignItems:'center'}}>
-          { order == "Name" ? renderIcon() : <Text style={{width:7}}/> }  
-          { order == "Name" ? <Text onPress={() => handlePress("Name")} style={{fontWeight: "600", paddingLeft: 7, }}>Name</Text> : <Text onPress={() => handlePress("Name")} style={styles.selector}>Name</Text> }  
+          { order == "id_desc" ? renderIcon() : <Text style={{width:7}}/> }  
+          { order == "id_desc" ? <Text onPress={() => handlePress("id_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Id</Text> : <Text onPress={() => handlePress("id_desc")} style={styles.selector}>Id</Text> }  
 
-          { order == "Price" ? renderIcon() : <Text style={{width:7}}/> }
-          { order == "Price" ? <Text onPress={() => handlePress("Price")} style={{fontWeight: "600", paddingLeft: 7, }}>Price</Text> : <Text onPress={() => handlePress("Price")} style={styles.selector}>Price</Text> }  
+          { order == "gecko_desc" ? renderIcon() : <Text style={{width:7}}/> }
+          { order == "gecko_desc" ? <Text onPress={() => handlePress("gecko_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Gecko</Text> : <Text onPress={() => handlePress("gecko_desc")} style={styles.selector}>Gecko</Text> }  
 
-          { order == "None" ? renderIcon() : <Text style={{width:7}}/> }
-          { order == "None" ? <Text onPress={() => handlePress("None")} style={{fontWeight: "600", paddingLeft: 7, }}>None</Text> : <Text onPress={() => handlePress("None")} style={styles.selector}>None</Text> }  
+          { order == "volume_desc" ? renderIcon() : <Text style={{width:7}}/> }
+          { order == "volume_desc" ? <Text onPress={() => handlePress("volume_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Volume</Text> : <Text onPress={() => handlePress("volume_desc")} style={styles.selector}>Volume</Text> }  
         </View>
       </View>
       <FlatList
