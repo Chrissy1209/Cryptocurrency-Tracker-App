@@ -67,12 +67,19 @@ export default function App() {
       <View style={styles.coinImage}>
         <Image style={{width:40, height:40}} source={{uri: item.image}}/>
       </View>
-      <View style={{flex: 1, paddingLeft: 10, justifyContent: 'center'}}>
+
+      <View style={{ flex:3, justifyContent: 'center' }}>
         <Text style={styles.coinName}>{item.name}</Text> 
         <Text style={styles.coinSymbol}>{item.symbol.toUpperCase()}</Text>
       </View>
-      <View style={{alignItems: 'flex-end', justifyContent: 'center'}}>
-        <Text style={styles.coinPrice}>US${item.current_price}</Text>
+
+      <View style={{flex: 4, alignItems: 'flex-start', justifyContent: 'center'}}>
+        <Text style={styles.coinPrice}>${item.current_price}</Text>
+        {/* <Text>${item.total_volume}</Text> */}
+      </View>
+
+      <View style={{flex: 2, alignItems: 'flex-end', justifyContent: 'center'}}>
+        {/* <Text style={styles.coinPrice}>${item.current_price}</Text> */}
         <Text>${item.total_volume}</Text>
       </View>
     </View>
@@ -145,6 +152,11 @@ export default function App() {
           { order == "volume_desc" ? <Text onPress={() => handlePress("volume_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Volume</Text> : <Text onPress={() => handlePress("volume_desc")} style={styles.selector}>Volume</Text> }  
         </View>
       </View>
+      <View style={styles.sortBar}>
+          <Text style={{ marginVertical: 6, marginHorizontal: 0, marginLeft: 0 }}>Name</Text>
+          <Text style={{ marginVertical: 6, marginHorizontal: 0, marginLeft: 0 }}>Price</Text>
+          <Text style={{ marginVertical: 6, marginHorizontal: 0, marginLeft: 0 }}>Volume</Text>
+      </View>
       <FlatList
         data={coins}
         renderItem={renderItem}
@@ -170,7 +182,6 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
   },
   header: {
-    // backgroundColor: 'green',
     marginHorizontal: 13,
     // backgroundColor: 'black',
     flexDirection: "row", 
@@ -199,6 +210,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     paddingLeft: 7, //keep all same
   },
+  sortBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    // borderTopWidth: 1,
+    borderBottomWidth: 1,
+  },
   listContainer: {
     // backgroundColor: "lightgray", 
     flexDirection: "row",
@@ -206,6 +223,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 13
   },
   coinImage: {
+    flex: 1,
+    marginRight: 15
   },
   coinName: {
     fontWeight: "600",
