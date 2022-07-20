@@ -67,19 +67,14 @@ export default function App() {
       <View style={styles.coinImage}>
         <Image style={{width:40, height:40}} source={{uri: item.image}}/>
       </View>
-
-      <View style={{ flex:4, justifyContent: 'center', marginLeft:3 }}>
+      <View style={{ flex:4, justifyContent: 'center', marginLeft:5 }}>
         <Text style={styles.coinName}>{item.name}</Text> 
         <Text style={styles.coinSymbol}>{item.symbol.toUpperCase()}</Text>
       </View>
-
       <View style={{flex: 4, alignItems: 'flex-start', justifyContent: 'center'}}>
-        <Text style={styles.coinPrice}>$ {item.current_price}</Text>
-        {/* <Text>${item.total_volume}</Text> */}
+        <Text style={styles.coinPrice}>${item.current_price}</Text>
       </View>
-
       <View style={{flex: 2, alignItems: 'flex-end', justifyContent: 'center'}}>
-        {/* <Text style={styles.coinPrice}>${item.current_price}</Text> */}
         <Text>$ {handleVolume(item.total_volume)}</Text>
       </View>
     </View>
@@ -160,9 +155,10 @@ export default function App() {
         </View>
       </View>
       <View style={styles.sortBar}>
-          <Text style={{ marginVertical: 6, marginHorizontal: 0, marginLeft: 0 }}>Name</Text>
-          <Text style={{ marginVertical: 6, marginHorizontal: 0, marginLeft: 0 }}>Price</Text>
-          <Text style={{ marginVertical: 6, marginHorizontal: 0, marginLeft: 0 }}>Volume</Text>
+          <Text style={{flex: 2, }}></Text>
+          <Text style={{flex: 4, }}>Name</Text>
+          <Text style={{flex: 4, }}>Price</Text>
+          <Text style={{flex: 2, }}>Volume</Text>
       </View>
       <FlatList
         data={coins}
@@ -219,9 +215,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     // borderTopWidth: 1,
+    paddingVertical: 7,
     borderBottomWidth: 1,
+    borderColor: "gray",
   },
   listContainer: {
+    // borderBottomWidth: 1,
+    // borderColor: "gray",
     // backgroundColor: "lightgray", 
     flexDirection: "row",
     marginVertical: 10,
