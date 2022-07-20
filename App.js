@@ -68,19 +68,19 @@ export default function App() {
         <Image style={{width:40, height:40}} source={{uri: item.image}}/>
       </View>
 
-      <View style={{ flex:3, justifyContent: 'center' }}>
+      <View style={{ flex:4, justifyContent: 'center', marginLeft:3 }}>
         <Text style={styles.coinName}>{item.name}</Text> 
         <Text style={styles.coinSymbol}>{item.symbol.toUpperCase()}</Text>
       </View>
 
       <View style={{flex: 4, alignItems: 'flex-start', justifyContent: 'center'}}>
-        <Text style={styles.coinPrice}>${item.current_price}</Text>
+        <Text style={styles.coinPrice}>$ {item.current_price}</Text>
         {/* <Text>${item.total_volume}</Text> */}
       </View>
 
       <View style={{flex: 2, alignItems: 'flex-end', justifyContent: 'center'}}>
         {/* <Text style={styles.coinPrice}>${item.current_price}</Text> */}
-        <Text>${item.total_volume}</Text>
+        <Text>$ {handleVolume(item.total_volume)}</Text>
       </View>
     </View>
   )
@@ -133,6 +133,13 @@ export default function App() {
     console.log(e) 
   }
 
+  const handleVolume = (e) => {
+    if(e > 1_000_000_000_000) return `${Math.floor(e/1_000_000_000_000)} T`
+    else if(e > 1_000_000_000) return `${Math.floor(e/1_000_000_000)} B`
+    else if(e > 1_000_000) return `${Math.floor(e/1_000_000)} M`
+    else if(e > 1_000) return `${Math.floor(e/1_000)} K`
+    else return e
+  }
   //------------
 
   return (
@@ -176,7 +183,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    // margin: 13,
     // alignItems: 'center',
     // backgroundColor: "lightblue",
     // justifyContent: 'center',
@@ -187,10 +193,9 @@ const styles = StyleSheet.create({
     flexDirection: "row", 
     justifyContent: 'space-between', 
     alignItems: 'center', 
-    height: 55,
+    height: 50,
   },
   title: {
-    // marginLeft: 13,
     color: 'indigo', //darkslateblue, darkblue, 6495ed, indigo, darkmagenta
     fontSize: 20,
     fontWeight: '900',
