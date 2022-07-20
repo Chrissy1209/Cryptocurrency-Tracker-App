@@ -153,7 +153,7 @@ export default function App() {
         ListFooterComponent={renderFooter}
         onEndReached={handleLoad}
         onEndReachedThreshold={0.1}
-        // keyExtractor = {item => item.id}
+        keyExtractor = {item => item.id}
         ListEmptyComponent={renderEmpty}
       />
     </SafeAreaView>
@@ -164,14 +164,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    margin: 13,
+    // margin: 13,
     // alignItems: 'center',
     // backgroundColor: "lightblue",
     // justifyContent: 'center',
   },
   header: {
     // backgroundColor: 'green',
-    // marginHorizontal: -13,
+    marginHorizontal: 13,
     // backgroundColor: 'black',
     flexDirection: "row", 
     justifyContent: 'space-between', 
@@ -202,12 +202,13 @@ const styles = StyleSheet.create({
   listContainer: {
     // backgroundColor: "lightgray", 
     flexDirection: "row",
-    paddingVertical: 10
+    marginVertical: 10,
+    marginHorizontal: 13
   },
   coinImage: {
   },
   coinName: {
-    fontWeight: "500",
+    fontWeight: "600",
     fontSize: 16
   },
   coinSymbol: {
@@ -217,3 +218,4 @@ const styles = StyleSheet.create({
     // paddingTop:
   }
 });
+
