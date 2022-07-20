@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, Text, View, FlatList, SafeAreaView, Image, ActivityIndicator } from 'react-native';
 import _ from 'lodash'
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function App() {
   const [coins, setCoins] = useState([]);
@@ -80,7 +81,8 @@ export default function App() {
     </View>
   )
   const renderIcon = () => (
-      <Image style={styles.icon} source={require("./assets/icon.png")} />
+    <MaterialIcons onPress={()=>{console.log("yee")}} name="sort" size={24} color="black" />
+      // <Image style={styles.icon} source={require("./assets/icon.png")} />
   )
   const renderFooter = () => (
       myLoading && enableLoad ?
@@ -143,15 +145,16 @@ export default function App() {
         <View>
           <Text style={styles.title}>Cryptocurrencies</Text>
         </View>
-        <View style={{flexDirection: "row", alignItems:'center'}}>
-          { order == "id_desc" ? renderIcon() : <Text style={{width:7}}/> }  
+        <View style={{  }}>
+          {renderIcon()}
+          {/* { order == "id_desc" ? renderIcon() : <Text style={{width:7}}/> }  
           { order == "id_desc" ? <Text onPress={() => handlePress("id_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Id</Text> : <Text onPress={() => handlePress("id_desc")} style={styles.selector}>Id</Text> }  
 
           { order == "gecko_desc" ? renderIcon() : <Text style={{width:7}}/> }
           { order == "gecko_desc" ? <Text onPress={() => handlePress("gecko_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Gecko</Text> : <Text onPress={() => handlePress("gecko_desc")} style={styles.selector}>Gecko</Text> }  
 
           { order == "volume_desc" ? renderIcon() : <Text style={{width:7}}/> }
-          { order == "volume_desc" ? <Text onPress={() => handlePress("volume_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Volume</Text> : <Text onPress={() => handlePress("volume_desc")} style={styles.selector}>Volume</Text> }  
+          { order == "volume_desc" ? <Text onPress={() => handlePress("volume_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Volume</Text> : <Text onPress={() => handlePress("volume_desc")} style={styles.selector}>Volume</Text> }   */}
         </View>
       </View>
       <View style={styles.sortBar}>
