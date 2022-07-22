@@ -18,7 +18,7 @@ const renderItem = ({ item }) => (
         <Text style={styles.coinSymbol}>{item.symbol.toUpperCase()}</Text>
       </View>
       <View style={{flex: 4, alignItems: 'flex-start', justifyContent: 'center'}}>
-        <Text style={styles.coinPrice}>${item.current_price}</Text>
+        <Text style={styles.coinPrice}>$ {item.current_price}</Text>
       </View>
       <View style={{flex: 2, alignItems: 'flex-end', justifyContent: 'center'}}>
         <Text>$ {handleVolume(item.total_volume)}</Text>
@@ -41,7 +41,8 @@ const styles = StyleSheet.create({
     },
     coinName: {
       fontWeight: "600",
-      fontSize: 16
+      fontSize: 16,
+      paddingBottom: 4,
     },
     coinSymbol: {
       fontSize: 12
