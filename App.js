@@ -1,53 +1,32 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView, Image, ActivityIndicator } from 'react-native';
-import _ from 'lodash'
-import { MaterialIcons } from '@expo/vector-icons';
+import { StyleSheet, ActionSheetIOS, Text, View, FlatList, SafeAreaView, ActivityIndicator } from 'react-native';
+import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import renderItem from './components/item';
 
 export default function App() {
   const [coins, setCoins] = useState([]);
   const [order, setOrder] = useState("Default")
-  const [PER_PAGE, setPER_PAGE] = useState(25);
+  const per_page = 25
   const [page, setPage] = useState(1)
   const [myRefreshing, setMyRefreshing] = useState(false)
   const [myLoading, setMyLoading] = useState(false)
   const [enableLoad, setEnableLoad] = useState(true)
-  useEffect(() => {
-    console.log("myRefreshing = " + myRefreshing)
-    console.log("------------page = "+ page +"---------------")
-    // const finalPage = myRefreshing ? 1 : page;
-    // setMyLoading ? getCoinsAPI(order, page) : getCoinsAPI("market_cap_desc", 1)
-  }, [page]);
+  const [toggle, setToggle] = useState(true)
 
-  const getCoinsAPI = async (ord, p) => {
-    return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=${ord}&per_page=${PER_PAGE}&page=${p}`)
+  useEffect(() => {
+    console.log("------------page = "+ page +"---------------")
+    getCoinsAPI(false, order, page)
+  }, [toggle]);
+
+  const getCoinsAPI = async (refresh, ord, p) => {
+    return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=${ord}&per_page=${per_page}&page=${p}`)
       .then((response) => response.json())
       .then((myList) => {
-        console.log("p="+p)
         console.log(myList.map(item => item.symbol));
-        console.log("myList.length = " + myList.length)
-        console.log("myRefreshing = " + myRefreshing)
         if(myList.length < 25) setEnableLoad(false)
 
-        if(myRefreshing) {
-          // setCoins(myList)
-
-          // const mySet = new Set(coins)
-          // console.log("mySet = " + mySet)
-          // mySet.add(myList)
-          // setCoins(Array.from(mySet))
-          setCoins([])
-          setCoins(myList)
-          // setCoins(() => {
-          //   let test = _.uniq(myList)
-          //   return test
-          // })
-
-          // let test = coins
-          // test = _.uniq(myList)
-          // setCoins(test)
-
-        } else {
+        if(refresh) setCoins(myList)
+        else {
           setCoins((preData) => {
             // return [...preData, ...myList]
             return preData.concat(myList)
@@ -65,14 +44,16 @@ export default function App() {
 //------------
 
   const renderIcon = () => (
-    <MaterialIcons onPress={()=>{console.log("yee")}} name="sort" size={24} color="black" />
-      // <Image style={styles.icon} source={require("./assets/icon.png")} />
+    <MaterialIcons onPress={()=>{onPress()}} name="sort" size={24} color="black" />
+  )
+  const renderSort = () => (
+    <FontAwesome5 name="sort-down" size={14} color="black" />
   )
   const renderFooter = () => (
-      myLoading && enableLoad ?
-      <View style={{marginTop: 5}}>
-        <ActivityIndicator size="large"/>
-      </View> : null
+    myLoading && enableLoad ?
+    <View style={{marginTop: 5}}>
+      <ActivityIndicator size="large"/>
+    </View> : null
   )
   const renderEmpty = () => (
     <View style={{height:600, alignItems:'center', justifyContent:'center'}}>
@@ -82,39 +63,57 @@ export default function App() {
 
 //------------
 
-  const handleRefreah = () => {
+  const handleRefresh = () => {
     setMyRefreshing(true)
-    if(page!=1) setPage(1)
-    else getCoinsAPI(order, 1)
+    setPage(1)
+    getCoinsAPI(true, order, 1)
   }
-
   const handleLoad = () => {
     setMyLoading(true)
-    if(enableLoad && !myLoading) setPage(page+1)
-  }
-
-  const handlePress = (e) => {
-    if(e=="id_desc") {
-      setOrder('id_desc')
-
-      setMyRefreshing(true)// <------------
-      console.log(myRefreshing)
-      getCoinsAPI("id_desc", 1)
-    } else if(e=="gecko_desc") {
-      setOrder('gecko_desc')
-
-      setMyRefreshing(true)// <------------
-      console.log(myRefreshing)
-      getCoinsAPI("gecko_desc", 1)
-    } else {
-      setOrder("Volume_desc")
-
+    if(enableLoad && !myLoading) {
+      setToggle(!toggle)
+      setPage(page+1)
     }
-
-    console.log(e) 
+  }
+  const onPress = () => {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ["Cancel", "ID", "Volume", "Market Cap"],
+        destructiveButtonIndex: 3,
+        cancelButtonIndex: 0,
+        userInterfaceStyle: 'dark',
+        // title: "Sort Cryptocurrencies By",
+      },
+      buttonIndex => {
+        if (buttonIndex === 0) {
+          // cancel action
+        } 
+        else if (buttonIndex === 1) 
+        {
+          setOrder('id_desc')
+          setMyRefreshing(true)
+          setPage(1)
+          getCoinsAPI(true, "id_desc", 1)
+        } 
+        else if (buttonIndex === 2) 
+        {
+          setOrder("volume_desc")
+          setMyRefreshing(true)
+          setPage(1)
+          getCoinsAPI(true, "volume_desc", 1)
+        }
+        else if (buttonIndex === 3)
+        {
+          setOrder("market_cap_desc")
+          setMyRefreshing(true)
+          setPage(1)
+          getCoinsAPI(true, "market_cap_desc", 1)
+        }
+      }
+    );
   }
 
-  //------------
+//------------
 
   return (
     <SafeAreaView style={styles.container}>
@@ -122,7 +121,7 @@ export default function App() {
         <View>
           <Text style={styles.title}>Cryptocurrencies</Text>
         </View>
-        <View style={{  }}>
+        <View>
           {renderIcon()}
           {/* { order == "id_desc" ? renderIcon() : <Text style={{width:7}}/> }  
           { order == "id_desc" ? <Text onPress={() => handlePress("id_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Id</Text> : <Text onPress={() => handlePress("id_desc")} style={styles.selector}>Id</Text> }  
@@ -137,14 +136,15 @@ export default function App() {
       <View style={styles.sortBar}>
           <Text style={{flex: 2, }}></Text>
           <Text style={{flex: 4, }}>Name</Text>
-          <Text style={{flex: 4, }}>Price</Text>
+          <Text style={{flex: 4, marginRight:8 }}>Price</Text>
+          {/* { order == "volume_desc" ? renderSort() : <Text style={{width:7}}/> } */}
           <Text style={{flex: 2, }}>Volume</Text>
       </View>
       <FlatList
         data={coins}
         renderItem={renderItem}
         refreshing={myRefreshing}
-        onRefresh={handleRefreah}
+        onRefresh={handleRefresh}
         ListFooterComponent={renderFooter}
         onEndReached={handleLoad}
         onEndReachedThreshold={0.1}
