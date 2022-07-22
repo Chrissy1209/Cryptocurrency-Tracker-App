@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, ActionSheetIOS, Text, View, FlatList, SafeAreaView, ActivityIndicator } from 'react-native';
-import _ from 'lodash'
+import _, { set } from 'lodash'
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import renderItem from './components/item';
 
@@ -13,14 +13,14 @@ export default function App() {
   const [myLoading, setMyLoading] = useState(false)
   const [enableLoad, setEnableLoad] = useState(true)
   useEffect(() => {
-    // console.log("myRefreshing = " + myRefreshing)
-    // console.log("myLoading = " + myLoading)
+    console.log("myRefreshing = " + myRefreshing)
+    console.log("myLoading = " + myLoading)
     console.log("------------page = "+ page +"---------------")
-    // const finalPage = myRefreshing ? 1 : page;
-    setMyLoading ? getCoinsAPI(order, page) : getCoinsAPI("market_cap_desc", 1)
-  }, [page]);
 
-  const getCoinsAPI = async (ord, p) => {
+    getCoinsAPI(false, order, page)
+  }, []);
+
+  const getCoinsAPI = async (refresh, ord, p) => {
     return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=${ord}&per_page=${per_page}&page=${p}`)
       .then((response) => response.json())
       .then((myList) => {
@@ -29,28 +29,8 @@ export default function App() {
         console.log("getCoinsAPI's myLoading = " + myLoading)
         if(myList.length < 25) setEnableLoad(false)
 
-        if(myRefreshing) {
-          // setCoins(myList)
-
-          // const mySet = new Set(coins)
-          // console.log("mySet = " + mySet)
-          // mySet.add(myList)
-          // setCoins(Array.from(mySet))
-
-          console.log("empty the list!!!")
-          setCoins([])
-
-          // setCoins(myList)
-          // setCoins(() => {
-          //   let test = _.uniq(myList)
-          //   return test
-          // })
-
-          // let test = coins
-          // test = _.uniq(myList)
-          // setCoins(test)
-
-        } else {
+        if(refresh) setCoins(myList)
+        else {
           setCoins((preData) => {
             // return [...preData, ...myList]
             return preData.concat(myList)
@@ -89,8 +69,8 @@ export default function App() {
 
   const handleRefreah = () => {
     setMyRefreshing(true)
-    if(page!=1) setPage(1)
-    else getCoinsAPI(order, 1)
+    getCoinsAPI(true, order, 1)
+    setPage(1)
   }
   const handleLoad = () => {
     setMyLoading(true)
@@ -108,20 +88,18 @@ export default function App() {
       buttonIndex => {
         if (buttonIndex === 0) {
           // cancel action
-        } else if (buttonIndex === 1) {
+        } 
+        else if (buttonIndex === 1) 
+        {
           setOrder('id_desc')
-
-          setMyRefreshing(true)// <------------
-          console.log(myRefreshing)
-          getCoinsAPI("id_desc", 1)
-
-        } else if (buttonIndex === 2) {
+          setMyRefreshing(true)
+          getCoinsAPI(true, "id_desc", 1)
+        } 
+        else if (buttonIndex === 2) 
+        {
           setOrder("volume_desc")
-
-          setMyRefreshing(true)// <------------
-          console.log(myRefreshing)
-          getCoinsAPI("volume_desc", 1)
-    
+          setMyRefreshing(true)
+          getCoinsAPI(true, "volume_desc", 1)
         }
       }
     );
