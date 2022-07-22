@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { StyleSheet, ActionSheetIOS, Text, View, FlatList, SafeAreaView, ActivityIndicator } from 'react-native';
-import _, { set } from 'lodash'
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import renderItem from './components/item';
 
@@ -12,21 +11,18 @@ export default function App() {
   const [myRefreshing, setMyRefreshing] = useState(false)
   const [myLoading, setMyLoading] = useState(false)
   const [enableLoad, setEnableLoad] = useState(true)
-  useEffect(() => {
-    console.log("myRefreshing = " + myRefreshing)
-    console.log("myLoading = " + myLoading)
-    console.log("------------page = "+ page +"---------------")
+  const [toggle, setToggle] = useState(true)
 
+  useEffect(() => {
+    console.log("------------page = "+ page +"---------------")
     getCoinsAPI(false, order, page)
-  }, []);
+  }, [toggle]);
 
   const getCoinsAPI = async (refresh, ord, p) => {
     return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=${ord}&per_page=${per_page}&page=${p}`)
       .then((response) => response.json())
       .then((myList) => {
         console.log(myList.map(item => item.symbol));
-        console.log("getCoinsAPI's myRefreshing = " + myRefreshing)
-        console.log("getCoinsAPI's myLoading = " + myLoading)
         if(myList.length < 25) setEnableLoad(false)
 
         if(refresh) setCoins(myList)
@@ -67,14 +63,17 @@ export default function App() {
 
 //------------
 
-  const handleRefreah = () => {
+  const handleRefresh = () => {
     setMyRefreshing(true)
-    getCoinsAPI(true, order, 1)
     setPage(1)
+    getCoinsAPI(true, order, 1)
   }
   const handleLoad = () => {
     setMyLoading(true)
-    if(enableLoad && !myLoading) setPage(page+1)
+    if(enableLoad && !myLoading) {
+      setToggle(!toggle)
+      setPage(page+1)
+    }
   }
   const onPress = () => {
     ActionSheetIOS.showActionSheetWithOptions(
@@ -93,13 +92,22 @@ export default function App() {
         {
           setOrder('id_desc')
           setMyRefreshing(true)
+          setPage(1)
           getCoinsAPI(true, "id_desc", 1)
         } 
         else if (buttonIndex === 2) 
         {
           setOrder("volume_desc")
           setMyRefreshing(true)
+          setPage(1)
           getCoinsAPI(true, "volume_desc", 1)
+        }
+        else if (buttonIndex === 3)
+        {
+          setOrder("market_cap_desc")
+          setMyRefreshing(true)
+          setPage(1)
+          getCoinsAPI(true, "market_cap_desc", 1)
         }
       }
     );
@@ -136,7 +144,7 @@ export default function App() {
         data={coins}
         renderItem={renderItem}
         refreshing={myRefreshing}
-        onRefresh={handleRefreah}
+        onRefresh={handleRefresh}
         ListFooterComponent={renderFooter}
         onEndReached={handleLoad}
         onEndReachedThreshold={0.1}
