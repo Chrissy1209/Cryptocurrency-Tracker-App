@@ -15,7 +15,7 @@ export default function App() {
 
   useEffect(() => {
     console.log("------------page = "+ page +"---------------")
-    getCoinsAPI(false, order, page)
+    // getCoinsAPI(false, order, page)
   }, [toggle]);
 
   const getCoinsAPI = async (refresh, ord, p) => {
@@ -46,9 +46,10 @@ export default function App() {
   const renderIcon = () => (
     <MaterialIcons onPress={()=>{onPress()}} name="sort" size={24} color="black" />
   )
-  const renderSort = () => (
-    <FontAwesome5 name="sort-down" size={14} color="black" />
-  )
+  const renderSort = (ord) => {
+    let myName = "sort-" + ord
+    return <FontAwesome5 name={myName} size={14} color="black" />
+  }
   const renderFooter = () => (
     myLoading && enableLoad ?
     <View style={{marginTop: 5}}>
@@ -75,10 +76,17 @@ export default function App() {
       setPage(page+1)
     }
   }
+  const handleOrder = (ord) => {
+    setCoins([])
+    setOrder(ord)
+    setMyRefreshing(true)
+    setPage(1)
+    getCoinsAPI(true, ord, 1)
+  }
   const onPress = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ["Cancel", "ID", "Volume", "Market Cap"],
+        options: ["Cancel", "ID_A-Z", "ID_Z-A", "Volume_DESC", "Volume_ASC", "MCap_DESC", "MCap_ASC"],
         destructiveButtonIndex: 3,
         cancelButtonIndex: 0,
         userInterfaceStyle: 'dark',
@@ -88,26 +96,23 @@ export default function App() {
         if (buttonIndex === 0) {
           // cancel action
         } 
-        else if (buttonIndex === 1) 
-        {
-          setOrder('id_desc')
-          setMyRefreshing(true)
-          setPage(1)
-          getCoinsAPI(true, "id_desc", 1)
+        else if (buttonIndex === 1) {
+          handleOrder('id_asc')
         } 
-        else if (buttonIndex === 2) 
-        {
-          setOrder("volume_desc")
-          setMyRefreshing(true)
-          setPage(1)
-          getCoinsAPI(true, "volume_desc", 1)
+        else if (buttonIndex === 2) {
+          handleOrder('id_desc')
+        } 
+        else if (buttonIndex === 3) {
+          handleOrder('volume_desc')
         }
-        else if (buttonIndex === 3)
-        {
-          setOrder("market_cap_desc")
-          setMyRefreshing(true)
-          setPage(1)
-          getCoinsAPI(true, "market_cap_desc", 1)
+        else if (buttonIndex === 4) {
+          handleOrder('volume_asc')
+        }
+        else if (buttonIndex === 5) {
+          handleOrder('market_cap_desc')
+        }
+        else if (buttonIndex === 6) {
+          handleOrder('market_cap_asc')
         }
       }
     );
@@ -123,28 +128,27 @@ export default function App() {
         </View>
         <View>
           {renderIcon()}
-          {/* { order == "id_desc" ? renderIcon() : <Text style={{width:7}}/> }  
-          { order == "id_desc" ? <Text onPress={() => handlePress("id_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Id</Text> : <Text onPress={() => handlePress("id_desc")} style={styles.selector}>Id</Text> }  
-
-          { order == "gecko_desc" ? renderIcon() : <Text style={{width:7}}/> }
-          { order == "gecko_desc" ? <Text onPress={() => handlePress("gecko_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Gecko</Text> : <Text onPress={() => handlePress("gecko_desc")} style={styles.selector}>Gecko</Text> }  
-
-          { order == "volume_desc" ? renderIcon() : <Text style={{width:7}}/> }
-          { order == "volume_desc" ? <Text onPress={() => handlePress("volume_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Volume</Text> : <Text onPress={() => handlePress("volume_desc")} style={styles.selector}>Volume</Text> }   */}
         </View>
       </View>
       <View style={styles.sortBar}>
-          <Text style={{flex: 2, }}></Text>
-          <Text style={{flex: 4, }}>Name</Text>
-          <Text style={{flex: 4, marginRight:8 }}>Price</Text>
-          {/* { order == "volume_desc" ? renderSort() : <Text style={{width:7}}/> } */}
-          <Text style={{flex: 2, }}>Volume</Text>
+          <Text style={{flex: 2}}></Text>
+          <Text style={{flex: 4}}>Name</Text>
+          <Text style={{flex: 4, marginRight: 4}}>Price</Text>
+          { 
+            order != "volume_desc" ?
+            order == "volume_asc" ? renderSort("up") :
+            <Text style={{width:9}} /> 
+            : 
+            renderSort("down") 
+          }
+          <Text style={{flex: 2, paddingLeft: 4}}>Volume</Text>
       </View>
       <FlatList
         data={coins}
         renderItem={renderItem}
         refreshing={myRefreshing}
         onRefresh={handleRefresh}
+        scrollsToTop={myRefreshing}
         ListFooterComponent={renderFooter}
         onEndReached={handleLoad}
         onEndReachedThreshold={0.1}
@@ -159,13 +163,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    // alignItems: 'center',
-    // backgroundColor: "lightblue",
-    // justifyContent: 'center',
   },
   header: {
     marginHorizontal: 13,
-    // backgroundColor: 'black',
     flexDirection: "row", 
     justifyContent: 'space-between', 
     alignItems: 'center', 
@@ -179,22 +179,10 @@ const styles = StyleSheet.create({
     // textShadowOffset: {width: 4, height: 3},
     // textShadowRadius: 2,
   },
-  icon: {
-    height: 12, 
-    width: 7, //keep all same
-    marginLeft: 4,
-    marginRight: -4,
-    // paddingLeft: 20
-  },
-  selector: {
-    color: 'dimgray',
-    fontWeight: "600",
-    paddingLeft: 7, //keep all same
-  },
   sortBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    // borderTopWidth: 1,
+    alignItems: 'center',
     paddingVertical: 7,
     borderBottomWidth: 1,
     borderColor: "gray",
