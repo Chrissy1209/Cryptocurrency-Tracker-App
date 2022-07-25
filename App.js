@@ -15,7 +15,7 @@ export default function App() {
 
   useEffect(() => {
     console.log("------------page = "+ page +"---------------")
-    getCoinsAPI(false, order, page)
+    // getCoinsAPI(false, order, page)
   }, [toggle]);
 
   const getCoinsAPI = async (refresh, ord, p) => {
@@ -46,9 +46,10 @@ export default function App() {
   const renderIcon = () => (
     <MaterialIcons onPress={()=>{onPress()}} name="sort" size={24} color="black" />
   )
-  const renderSort = () => (
-    <FontAwesome5 name="sort-down" size={14} color="black" />
-  )
+  const renderSort = (ord) => {
+    let myName = "sort-" + ord
+    return <FontAwesome5 name={myName} size={14} color="black" />
+  }
   const renderFooter = () => (
     myLoading && enableLoad ?
     <View style={{marginTop: 5}}>
@@ -127,22 +128,20 @@ export default function App() {
         </View>
         <View>
           {renderIcon()}
-          {/* { order == "id_desc" ? renderIcon() : <Text style={{width:7}}/> }  
-          { order == "id_desc" ? <Text onPress={() => handlePress("id_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Id</Text> : <Text onPress={() => handlePress("id_desc")} style={styles.selector}>Id</Text> }  
-
-          { order == "gecko_desc" ? renderIcon() : <Text style={{width:7}}/> }
-          { order == "gecko_desc" ? <Text onPress={() => handlePress("gecko_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Gecko</Text> : <Text onPress={() => handlePress("gecko_desc")} style={styles.selector}>Gecko</Text> }  
-
-          { order == "volume_desc" ? renderIcon() : <Text style={{width:7}}/> }
-          { order == "volume_desc" ? <Text onPress={() => handlePress("volume_desc")} style={{fontWeight: "600", paddingLeft: 7, }}>Volume</Text> : <Text onPress={() => handlePress("volume_desc")} style={styles.selector}>Volume</Text> }   */}
         </View>
       </View>
       <View style={styles.sortBar}>
-          <Text style={{flex: 2, }}></Text>
-          <Text style={{flex: 4, }}>Name</Text>
-          <Text style={{flex: 4, marginRight:8 }}>Price</Text>
-          {/* { order == "volume_desc" ? renderSort() : <Text style={{width:7}}/> } */}
-          <Text style={{flex: 2, }}>Volume</Text>
+          <Text style={{flex: 2}}></Text>
+          <Text style={{flex: 4}}>Name</Text>
+          <Text style={{flex: 4, marginRight: 4}}>Price</Text>
+          { 
+            order != "volume_desc" ?
+            order == "volume_asc" ? renderSort("up") :
+            <Text style={{width:9}} /> 
+            : 
+            renderSort("down") 
+          }
+          <Text style={{flex: 2, paddingLeft: 4}}>Volume</Text>
       </View>
       <FlatList
         data={coins}
@@ -180,21 +179,10 @@ const styles = StyleSheet.create({
     // textShadowOffset: {width: 4, height: 3},
     // textShadowRadius: 2,
   },
-  icon: {
-    height: 12, 
-    width: 7, //keep all same
-    marginLeft: 4,
-    marginRight: -4,
-    // paddingLeft: 20
-  },
-  selector: {
-    color: 'dimgray',
-    fontWeight: "600",
-    paddingLeft: 7, //keep all same
-  },
   sortBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    alignItems: 'center',
     paddingVertical: 7,
     borderBottomWidth: 1,
     borderColor: "gray",
