@@ -75,10 +75,17 @@ export default function App() {
       setPage(page+1)
     }
   }
+  const handleOrder = (ord) => {
+    setCoins([])
+    setOrder(ord)
+    setMyRefreshing(true)
+    setPage(1)
+    getCoinsAPI(true, ord, 1)
+  }
   const onPress = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ["Cancel", "ID", "Volume", "Market Cap"],
+        options: ["Cancel", "ID_A-Z", "ID_Z-A", "Volume_DESC", "Volume_ASC", "MCap_DESC", "MCap_ASC"],
         destructiveButtonIndex: 3,
         cancelButtonIndex: 0,
         userInterfaceStyle: 'dark',
@@ -88,26 +95,23 @@ export default function App() {
         if (buttonIndex === 0) {
           // cancel action
         } 
-        else if (buttonIndex === 1) 
-        {
-          setOrder('id_desc')
-          setMyRefreshing(true)
-          setPage(1)
-          getCoinsAPI(true, "id_desc", 1)
+        else if (buttonIndex === 1) {
+          handleOrder('id_asc')
         } 
-        else if (buttonIndex === 2) 
-        {
-          setOrder("volume_desc")
-          setMyRefreshing(true)
-          setPage(1)
-          getCoinsAPI(true, "volume_desc", 1)
+        else if (buttonIndex === 2) {
+          handleOrder('id_desc')
+        } 
+        else if (buttonIndex === 3) {
+          handleOrder('volume_desc')
         }
-        else if (buttonIndex === 3)
-        {
-          setOrder("market_cap_desc")
-          setMyRefreshing(true)
-          setPage(1)
-          getCoinsAPI(true, "market_cap_desc", 1)
+        else if (buttonIndex === 4) {
+          handleOrder('volume_asc')
+        }
+        else if (buttonIndex === 5) {
+          handleOrder('market_cap_desc')
+        }
+        else if (buttonIndex === 6) {
+          handleOrder('market_cap_asc')
         }
       }
     );
@@ -145,6 +149,7 @@ export default function App() {
         renderItem={renderItem}
         refreshing={myRefreshing}
         onRefresh={handleRefresh}
+        scrollsToTop={myRefreshing}
         ListFooterComponent={renderFooter}
         onEndReached={handleLoad}
         onEndReachedThreshold={0.1}
@@ -159,13 +164,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    // alignItems: 'center',
-    // backgroundColor: "lightblue",
-    // justifyContent: 'center',
   },
   header: {
     marginHorizontal: 13,
-    // backgroundColor: 'black',
     flexDirection: "row", 
     justifyContent: 'space-between', 
     alignItems: 'center', 
@@ -194,7 +195,6 @@ const styles = StyleSheet.create({
   sortBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    // borderTopWidth: 1,
     paddingVertical: 7,
     borderBottomWidth: 1,
     borderColor: "gray",
