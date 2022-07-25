@@ -5,9 +5,10 @@ import renderItem from './components/item';
 
 export default function App() {
   const [coins, setCoins] = useState([]);
-  const [order, setOrder] = useState("Default")
+  const [order, setOrder] = useState("market_cap_desc")
   const per_page = 25
   const [page, setPage] = useState(1)
+
   const [myRefreshing, setMyRefreshing] = useState(false)
   const [myLoading, setMyLoading] = useState(false)
   const [enableLoad, setEnableLoad] = useState(true)
@@ -15,7 +16,7 @@ export default function App() {
 
   useEffect(() => {
     console.log("------------page = "+ page +"---------------")
-    // getCoinsAPI(false, order, page)
+    getCoinsAPI(false, order, page)
   }, [toggle]);
 
   const getCoinsAPI = async (refresh, ord, p) => {
@@ -83,11 +84,15 @@ export default function App() {
     setPage(1)
     getCoinsAPI(true, ord, 1)
   }
+  const handleColor = () => {
+    const list = ['None', 'id_asc', 'id_desc', 'volume_desc', 'volume_asc', 'market_cap_desc', 'market_cap_asc']
+    return list.indexOf(order)
+  }
   const onPress = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: ["Cancel", "ID_A-Z", "ID_Z-A", "Volume_DESC", "Volume_ASC", "MCap_DESC", "MCap_ASC"],
-        destructiveButtonIndex: 3,
+        destructiveButtonIndex: handleColor(),
         cancelButtonIndex: 0,
         userInterfaceStyle: 'dark',
         // title: "Sort Cryptocurrencies By",
@@ -175,9 +180,9 @@ const styles = StyleSheet.create({
     color: 'indigo', //darkslateblue, darkblue, 6495ed, indigo, darkmagenta
     fontSize: 20,
     fontWeight: '900',
-    // textShadowColor: "lightgray",
-    // textShadowOffset: {width: 4, height: 3},
-    // textShadowRadius: 2,
+    textShadowColor: "lightgray",
+    textShadowOffset: {width: 4, height: 3},
+    textShadowRadius: 2,
   },
   sortBar: {
     flexDirection: 'row',
