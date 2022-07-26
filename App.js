@@ -16,7 +16,7 @@ export default function App() {
 
   useEffect(() => {
     console.log("------------page = "+ page +"---------------")
-    getCoinsAPI(false, order, page)
+    // getCoinsAPI(false, order, page)
   }, [toggle]);
 
   const getCoinsAPI = async (refresh, ord, p) => {
@@ -36,16 +36,14 @@ export default function App() {
         setMyRefreshing(false)
         setMyLoading(false)
       })
-      .catch((error) => {
-        console.error(error);
-      });
+      .catch((error) => console.error(error))
   };
 
 
 //------------
 
   const renderIcon = () => (
-    <MaterialIcons onPress={()=>{onPress()}} name="sort" size={24} color="black" />
+    <MaterialIcons onPress={()=>{onPress()}} name="sort" size={24} color="gray" />
   )
   const renderSort = (ord) => {
     let myName = "sort-" + ord
@@ -137,16 +135,16 @@ export default function App() {
       </View>
       <View style={styles.sortBar}>
           <Text style={{flex: 2}}></Text>
-          <Text style={{flex: 4}}>Name</Text>
-          <Text style={{flex: 4, marginRight: 4}}>Price</Text>
+          <Text style={{flex: 4, marginRight:-6}}>Name</Text>
+          <Text style={{flex: 4, marginRight:-10}}>Price</Text>
           { 
             order != "volume_desc" ?
             order == "volume_asc" ? renderSort("up") :
-            <Text style={{width:9}} /> 
+            <FontAwesome5 name='sort-up' size={14} color="#fff" />
             : 
             renderSort("down") 
           }
-          <Text style={{flex: 2, paddingLeft: 4}}>Volume</Text>
+          <Text style={{flex: 2, paddingHorizontal:3}}>Volume</Text>
       </View>
       <FlatList
         data={coins}
@@ -170,13 +168,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    marginHorizontal: 13,
+    marginHorizontal: 15,
     flexDirection: "row", 
     justifyContent: 'space-between', 
     alignItems: 'center', 
     height: 50,
   },
   title: {
+    width: 220,
+    height: '60%',
     color: 'indigo', //darkslateblue, darkblue, 6495ed, indigo, darkmagenta
     fontSize: 20,
     fontWeight: '900',
