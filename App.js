@@ -16,7 +16,7 @@ export default function App() {
 
   useEffect(() => {
     console.log("------------page = "+ page +"---------------")
-    // getCoinsAPI(false, order, page)
+    getCoinsAPI(false, order, page)
   }, [toggle]);
 
   const getCoinsAPI = async (refresh, ord, p) => {
@@ -93,7 +93,7 @@ export default function App() {
         destructiveButtonIndex: handleColor(),
         cancelButtonIndex: 0,
         userInterfaceStyle: 'dark',
-        // title: "Sort Cryptocurrencies By",
+        title: "Sort cryptocurrencies by",
       },
       buttonIndex => {
         if (buttonIndex === 0) {
@@ -144,7 +144,11 @@ export default function App() {
             : 
             renderSort("down") 
           }
-          <Text style={{flex: 2, paddingHorizontal:3}}>Volume</Text>
+          <Text style={{flex: 2, paddingHorizontal:3}}
+            onPress={()=>{
+              if(order == "volume_desc") handleOrder('volume_asc')
+              else handleOrder('volume_desc')
+          }}>Volume</Text>
       </View>
       <FlatList
         data={coins}
