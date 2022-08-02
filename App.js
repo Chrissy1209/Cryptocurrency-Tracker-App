@@ -41,29 +41,8 @@ export default function App() {
     };
     getingCoinsAPI()
   }, [])
-  // const getCoinsAPI = async (refresh, ord, p) => {
-  //   return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=${ord}&per_page=${per_page}&page=${p}`)
-  //     .then((response) => response.json())
-  //     .then((myList) => {
-  //       console.log(myList.map(item => item.symbol));
-  //       if(myList.length < 25) setEnableLoad(false)
-
-  //       if(refresh) setCoins(myList)
-  //       else {
-  //         setCoins((preData) => {
-  //           // return [...preData, ...myList]
-  //           return preData.concat(myList)
-  //         })
-  //       }
-  //       setMyRefreshing(false)
-  //       setMyLoading(false)
-  //     })
-  //     .catch((error) => console.error(error))
-  // };
-
 
   //------------
-
 
   const renderSort = useCallback((ord) => {
     let myName = `sort-${ord}`
@@ -154,9 +133,9 @@ export default function App() {
         </View>
       </View>
       <View style={styles.sortBar}>
-          <Text style={{flex: 2}}></Text>
-          <Text style={{flex: 4, marginRight:-6}}>Name</Text>
-          <Text style={{flex: 4, marginRight:-10}}>Price</Text>
+          <Text style={styles.emptyBox}></Text>
+          <Text style={styles.sortBar_Name}>Name</Text>
+          <Text style={styles.sortBar_Price}>Price</Text>
           { 
             order != "volume_desc" ?
             order == "volume_asc" ? renderSort("up") :
@@ -164,7 +143,7 @@ export default function App() {
             : 
             renderSort("down") 
           }
-          <Text style={{flex: 2, paddingHorizontal:3}}
+          <Text style={styles.sortBar_Volume}
             onPress={()=>{
               if(order == "volume_desc") handleOrder('volume_asc')
               else handleOrder('volume_desc')
@@ -215,5 +194,20 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderBottomWidth: 1,
     borderColor: "gray",
+  },
+  sortBar_Name: {
+    flex: 4,
+    marginRight:-6,
+  },
+  sortBar_Price: {
+    flex: 4,
+    marginRight:-10,
+  },
+  sortBar_Volume: {
+    flex: 2,
+    paddingHorizontal:3,
+  },
+  emptyBox: {
+    flex: 2,
   },
 });

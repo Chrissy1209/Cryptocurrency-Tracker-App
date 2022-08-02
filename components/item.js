@@ -11,17 +11,17 @@
   const renderItem = ({ item }) => (
     <View style={styles.listContainer}>
       <View style={styles.coinImage}>
-        <Image style={{width:40, height:40}} source={{uri: item.image}}/>
+        <Image style={styles.Image} source={{uri: item.image}}/>
       </View>
-      <View style={{ flex:4, justifyContent: 'center', marginLeft: 5}}>
+      <View style={styles.coinNameCtner}>
         <Text style={styles.coinName}>{item.name}</Text> 
         <Text style={styles.coinSymbol}>{item.symbol.toUpperCase()}</Text>
       </View>
-      <View style={{flex: 4, alignItems: 'flex-start', justifyContent: 'center'}}>
-        <Text style={{fontSize: 13}}>$ {item.current_price}</Text>
+      <View style={styles.coinPrice}>
+        <Text style={styles.fontSize}>$ {item.current_price}</Text>
       </View>
-      <View style={{flex: 2, alignItems: 'flex-end', justifyContent: 'center'}}>
-        <Text style={{fontSize: 13}}>$ {handleVolume(item.total_volume)}</Text>
+      <View style={styles.coinVolume}>
+        <Text style={styles.fontSize}>$ {handleVolume(item.total_volume)}</Text>
       </View>
     </View>
   )
@@ -34,7 +34,16 @@
     },
     coinImage: {
       flex: 1,
-      marginRight: 15
+      marginRight: 15,
+    },
+    Image: {
+      width:40,
+      height:40,
+    },
+    coinNameCtner: {
+      flex:4,
+      justifyContent: 'center',
+      marginLeft: 5,
     },
     coinName: {
       fontWeight: "600",
@@ -43,6 +52,19 @@
     },
     coinSymbol: {
       fontSize: 12
+    },
+    coinPrice: {
+      flex: 4,
+      alignItems: 'flex-start',
+      justifyContent: 'center',
+    },
+    coinVolume: {
+      flex: 2,
+      alignItems: 'flex-end',
+      justifyContent: 'center',
+    },
+    fontSize: {
+      fontSize: 13,
     },
   });
 
