@@ -4,9 +4,9 @@ import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import renderItem from './components/item';
 
 export default function App() {
+  const per_page = 25
   const [coins, setCoins] = useState([]);
   const [order, setOrder] = useState("market_cap_desc")
-  const per_page = 25
   const [page, setPage] = useState(1)
 
   const [myRefreshing, setMyRefreshing] = useState(false)
@@ -15,59 +15,58 @@ export default function App() {
   const [toggle, setToggle] = useState(true)
 
   useEffect(() => {
-    console.log("------------page = "+ page +"---------------")
+    console.log(`------------page = ${page}---------------`)
     getCoinsAPI(false, order, page)
   }, [toggle]);
 
-  const getCoinsAPI = async (refresh, ord, p) => {
-    return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=${ord}&per_page=${per_page}&page=${p}`)
-      .then((response) => response.json())
-      .then((myList) => {
-        console.log(myList.map(item => item.symbol));
-        if(myList.length < 25) setEnableLoad(false)
+  const getCoinsAPI = useCallback((refresh, ord, p) => {
+    const getingCoinsAPI = async () => {
+      return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=${ord}&per_page=${per_page}&page=${p}`)
+        .then((response) => response.json())
+        .then((myList) => {
+          console.log(myList.map(item => item.symbol));
+          if(myList.length < 25) setEnableLoad(false)
 
-        if(refresh) setCoins(myList)
-        else {
-          setCoins((preData) => {
-            // return [...preData, ...myList]
-            return preData.concat(myList)
-          })
-        }
-        setMyRefreshing(false)
-        setMyLoading(false)
-      })
-      .catch((error) => console.error(error))
-  };
+          if(refresh) setCoins(myList)
+          else {
+            setCoins((preData) => {
+              // return [...preData, ...myList]
+              return preData.concat(myList)
+            })
+          }
+          setMyRefreshing(false)
+          setMyLoading(false)
+        })
+        .catch((error) => console.error(error))
+    };
+    getingCoinsAPI()
+  }, [])
 
+  //------------
 
-//------------
-
-  const renderIcon = () => (
-    <MaterialIcons onPress={()=>{onPress()}} name="sort" size={24} color="gray" />
-  )
-  const renderSort = (ord) => {
-    let myName = "sort-" + ord
+  const renderSort = useCallback((ord) => {
+    let myName = `sort-${ord}`
     return <FontAwesome5 name={myName} size={14} color="black" />
-  }
-  const renderFooter = () => (
+  })
+  const renderFooter = React.memo(() => (
     myLoading && enableLoad ?
     <View style={{marginTop: 5}}>
       <ActivityIndicator size="large"/>
     </View> : null
-  )
-  const renderEmpty = () => (
+  ))
+  const renderEmpty = React.memo(() => (
     <View style={{height:600, alignItems:'center', justifyContent:'center'}}>
       <Text style={{fontSize:18, fontWeight:'400', }}>Pull down to refreshing.</Text>
     </View>
-  )
+  ))
 
-//------------
+  //------------
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     setMyRefreshing(true)
     setPage(1)
     getCoinsAPI(true, order, 1)
-  }
+  }, [order])
   const handleLoad = () => {
     setMyLoading(true)
     if(enableLoad && !myLoading) {
@@ -75,18 +74,18 @@ export default function App() {
       setPage(page+1)
     }
   }
-  const handleOrder = (ord) => {
+  const handleOrder = useCallback((ord) => {
     setCoins([])
     setOrder(ord)
     setMyRefreshing(true)
     setPage(1)
     getCoinsAPI(true, ord, 1)
-  }
-  const handleColor = () => {
+  })
+  const handleColor = useCallback(() => {
     const list = ['None', 'id_asc', 'id_desc', 'volume_desc', 'volume_asc', 'market_cap_desc', 'market_cap_asc']
     return list.indexOf(order)
-  }
-  const onPress = () => {
+  }, [order])
+  const handleOnPress = () => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: ["Cancel", "ID_A-Z", "ID_Z-A", "Volume_DESC", "Volume_ASC", "MCap_DESC", "MCap_ASC"],
@@ -118,10 +117,10 @@ export default function App() {
           handleOrder('market_cap_asc')
         }
       }
-    );
+    )
   }
 
-//------------
+  //------------
 
   return (
     <SafeAreaView style={styles.container}>
@@ -130,13 +129,13 @@ export default function App() {
           <Text style={styles.title}>Cryptocurrencies</Text>
         </View>
         <View>
-          {renderIcon()}
+          <MaterialIcons onPress={()=>{handleOnPress()}} name="sort" size={24} color="gray" />
         </View>
       </View>
       <View style={styles.sortBar}>
-          <Text style={{flex: 2}}></Text>
-          <Text style={{flex: 4, marginRight:-6}}>Name</Text>
-          <Text style={{flex: 4, marginRight:-10}}>Price</Text>
+          <Text style={styles.emptyBox}></Text>
+          <Text style={styles.sortBar_Name}>Name</Text>
+          <Text style={styles.sortBar_Price}>Price</Text>
           { 
             order != "volume_desc" ?
             order == "volume_asc" ? renderSort("up") :
@@ -144,7 +143,7 @@ export default function App() {
             : 
             renderSort("down") 
           }
-          <Text style={{flex: 2, paddingHorizontal:3}}
+          <Text style={styles.sortBar_Volume}
             onPress={()=>{
               if(order == "volume_desc") handleOrder('volume_asc')
               else handleOrder('volume_desc')
@@ -195,5 +194,20 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderBottomWidth: 1,
     borderColor: "gray",
+  },
+  sortBar_Name: {
+    flex: 4,
+    marginRight:-6,
+  },
+  sortBar_Price: {
+    flex: 4,
+    marginRight:-10,
+  },
+  sortBar_Volume: {
+    flex: 2,
+    paddingHorizontal:3,
+  },
+  emptyBox: {
+    flex: 2,
   },
 });
