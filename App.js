@@ -3,10 +3,16 @@ import { StyleSheet, ActionSheetIOS, Text, View, FlatList, SafeAreaView, Activit
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import renderItem from './components/item';
 
+const renderEmpty = React.memo(() => (
+  <View style={styles.emptyBox}>
+    <Text style={styles.emptyText}>Pull down to refreshing.</Text>
+  </View>
+))
+
 export default function App() {
   const per_page = 25
-  const [coins, setCoins] = useState([]);
-  const [order, setOrder] = useState("market_cap_desc")
+  const [coins, setCoins] = useState([])
+  const [order, setOrder] = useState('market_cap_desc')
   const [page, setPage] = useState(1)
 
   const [myRefreshing, setMyRefreshing] = useState(false)
@@ -17,48 +23,42 @@ export default function App() {
   useEffect(() => {
     console.log(`------------page = ${page}---------------`)
     getCoinsAPI(false, order, page)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toggle]);
 
   const getCoinsAPI = useCallback((refresh, ord, p) => {
-    const getingCoinsAPI = async () => {
-      return fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=${ord}&per_page=${per_page}&page=${p}`)
+    const getingCoinsAPI = async () => (
+      fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=${ord}&per_page=${per_page}&page=${p}`)
         .then((response) => response.json())
         .then((myList) => {
-          console.log(myList.map(item => item.symbol));
-          if(myList.length < 25) setEnableLoad(false)
+          console.log(myList.map((item) => item.symbol));
+          if (myList.length < 25) setEnableLoad(false)
 
-          if(refresh) setCoins(myList)
+          if (refresh) setCoins(myList)
           else {
-            setCoins((preData) => {
-              // return [...preData, ...myList]
-              return preData.concat(myList)
-            })
+            setCoins((preData) => preData.concat(myList)) // [...preData, ...myList]
           }
           setMyRefreshing(false)
           setMyLoading(false)
         })
         .catch((error) => console.error(error))
-    };
+    )
     getingCoinsAPI()
   }, [])
 
   //------------
 
   const renderSort = useCallback((ord) => {
-    let myName = `sort-${ord}`
-    return <FontAwesome5 name={myName} size={14} color="black" />
-  })
-  const renderFooter = React.memo(() => (
-    myLoading && enableLoad ?
-    <View style={{marginTop: 5}}>
-      <ActivityIndicator size="large"/>
-    </View> : null
-  ))
-  const renderEmpty = React.memo(() => (
-    <View style={{height:600, alignItems:'center', justifyContent:'center'}}>
-      <Text style={{fontSize:18, fontWeight:'400', }}>Pull down to refreshing.</Text>
-    </View>
-  ))
+    const Myname = `sort-${ord}`
+    return <FontAwesome5 name={Myname} size={14} color="black" />
+  }, [])
+  const renderFooter = () => (
+    myLoading && enableLoad ? (
+      <View style={styles.footer}>
+        <ActivityIndicator size="large" />
+      </View>
+    ) : null
+  )
 
   //------------
 
@@ -66,59 +66,57 @@ export default function App() {
     setMyRefreshing(true)
     setPage(1)
     getCoinsAPI(true, order, 1)
-  }, [order])
-  const handleLoad = () => {
+  }, [order, getCoinsAPI])
+  const handleLoad = useCallback(() => {
     setMyLoading(true)
-    if(enableLoad && !myLoading) {
+    if (enableLoad && !myLoading) {
       setToggle(!toggle)
-      setPage(page+1)
+      setPage(page + 1)
     }
-  }
+  }, [page, toggle, enableLoad, myLoading])
   const handleOrder = useCallback((ord) => {
     setCoins([])
     setOrder(ord)
     setMyRefreshing(true)
     setPage(1)
     getCoinsAPI(true, ord, 1)
-  })
+  }, [getCoinsAPI])
   const handleColor = useCallback(() => {
     const list = ['None', 'id_asc', 'id_desc', 'volume_desc', 'volume_asc', 'market_cap_desc', 'market_cap_asc']
     return list.indexOf(order)
   }, [order])
-  const handleOnPress = () => {
+  const handleOnPress = useCallback(() => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ["Cancel", "ID_A-Z", "ID_Z-A", "Volume_DESC", "Volume_ASC", "MCap_DESC", "MCap_ASC"],
+        options: ['Cancel', 'ID_A-Z', 'ID_Z-A', 'Volume_DESC', 'Volume_ASC', 'MCap_DESC', 'MCap_ASC'],
         destructiveButtonIndex: handleColor(),
         cancelButtonIndex: 0,
         userInterfaceStyle: 'dark',
-        title: "Sort cryptocurrencies by",
+        title: 'Sort cryptocurrencies by',
       },
-      buttonIndex => {
+      (buttonIndex) => {
         if (buttonIndex === 0) {
           // cancel action
-        } 
-        else if (buttonIndex === 1) {
+        } else if (buttonIndex === 1) {
           handleOrder('id_asc')
-        } 
-        else if (buttonIndex === 2) {
+        } else if (buttonIndex === 2) {
           handleOrder('id_desc')
-        } 
-        else if (buttonIndex === 3) {
+        } else if (buttonIndex === 3) {
           handleOrder('volume_desc')
-        }
-        else if (buttonIndex === 4) {
+        } else if (buttonIndex === 4) {
           handleOrder('volume_asc')
-        }
-        else if (buttonIndex === 5) {
+        } else if (buttonIndex === 5) {
           handleOrder('market_cap_desc')
-        }
-        else if (buttonIndex === 6) {
+        } else if (buttonIndex === 6) {
           handleOrder('market_cap_asc')
         }
-      }
+      },
     )
-  }
+  }, [handleColor, handleOrder])
+  const handleTitleOnPress = useCallback(() => {
+    if (order === 'volume_desc') handleOrder('volume_asc')
+    else handleOrder('volume_desc')
+  }, [order, handleOrder])
 
   //------------
 
@@ -129,25 +127,24 @@ export default function App() {
           <Text style={styles.title}>Cryptocurrencies</Text>
         </View>
         <View>
-          <MaterialIcons onPress={()=>{handleOnPress()}} name="sort" size={24} color="gray" />
+          <MaterialIcons onPress={() => handleOnPress()} name="sort" size={24} color="gray" />
         </View>
       </View>
       <View style={styles.sortBar}>
-          <Text style={styles.emptyBox}></Text>
-          <Text style={styles.sortBar_Name}>Name</Text>
-          <Text style={styles.sortBar_Price}>Price</Text>
-          { 
-            order != "volume_desc" ?
-            order == "volume_asc" ? renderSort("up") :
-            <FontAwesome5 name='sort-up' size={14} color="#fff" />
-            : 
-            renderSort("down") 
-          }
-          <Text style={styles.sortBar_Volume}
-            onPress={()=>{
-              if(order == "volume_desc") handleOrder('volume_asc')
-              else handleOrder('volume_desc')
-          }}>Volume</Text>
+        <Text style={styles.emptyTitle} />
+        <Text style={styles.sortBar_Name}>Name</Text>
+        <Text style={styles.sortBar_Price}>Price</Text>
+        {
+          order !== 'volume_desc'
+            ? order === 'volume_asc' ? renderSort('up')
+              : <FontAwesome5 name="sort-up" size={14} color="#fff" />
+            : renderSort('down')
+        }
+        <Text
+          onPress={handleTitleOnPress}
+          style={styles.sortBar_Volume}
+        >Volume
+        </Text>
       </View>
       <FlatList
         data={coins}
@@ -158,7 +155,7 @@ export default function App() {
         ListFooterComponent={renderFooter}
         onEndReached={handleLoad}
         onEndReachedThreshold={0.1}
-        keyExtractor = {item => item.id}
+        keyExtractor={(item) => item.id}
         ListEmptyComponent={renderEmpty}
       />
     </SafeAreaView>
@@ -172,19 +169,19 @@ const styles = StyleSheet.create({
   },
   header: {
     marginHorizontal: 15,
-    flexDirection: "row", 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     height: 50,
   },
   title: {
     width: 220,
     height: '60%',
-    color: 'indigo', //darkslateblue, darkblue, 6495ed, indigo, darkmagenta
+    color: 'indigo', // darkslateblue, darkblue, 6495ed, indigo, darkmagenta
     fontSize: 20,
     fontWeight: '900',
-    textShadowColor: "lightgray",
-    textShadowOffset: {width: 4, height: 3},
+    textShadowColor: 'lightgray',
+    textShadowOffset: { width: 4, height: 3 },
     textShadowRadius: 2,
   },
   sortBar: {
@@ -193,21 +190,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 7,
     borderBottomWidth: 1,
-    borderColor: "gray",
+    borderColor: 'gray',
   },
   sortBar_Name: {
     flex: 4,
-    marginRight:-6,
+    marginRight: -6,
   },
   sortBar_Price: {
     flex: 4,
-    marginRight:-10,
+    marginRight: -10,
   },
   sortBar_Volume: {
     flex: 2,
-    paddingHorizontal:3,
+    paddingHorizontal: 3,
+  },
+  emptyTitle: {
+    flex: 2,
   },
   emptyBox: {
-    flex: 2,
+    height: 600,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '400',
+  },
+  footer: {
+    marginTop: 5,
   },
 });
