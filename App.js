@@ -22,7 +22,8 @@ export default function App() {
 
   useEffect(() => {
     console.log(`------------page = ${page}---------------`)
-    // getCoinsAPI(false, order, page)
+    getCoinsAPI(false, order, page)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toggle]);
 
   const getCoinsAPI = useCallback((refresh, ord, p) => {
@@ -50,7 +51,7 @@ export default function App() {
   const renderSort = useCallback((ord) => {
     const Myname = `sort-${ord}`
     return <FontAwesome5 name={Myname} size={14} color="black" />
-  })
+  }, [])
   const renderFooter = () => (
     myLoading && enableLoad ? (
       <View style={styles.footer}>
@@ -65,26 +66,26 @@ export default function App() {
     setMyRefreshing(true)
     setPage(1)
     getCoinsAPI(true, order, 1)
-  }, [order])
-  const handleLoad = () => {
+  }, [order, getCoinsAPI])
+  const handleLoad = useCallback(() => {
     setMyLoading(true)
     if (enableLoad && !myLoading) {
       setToggle(!toggle)
       setPage(page + 1)
     }
-  }
+  }, [page, toggle, enableLoad, myLoading])
   const handleOrder = useCallback((ord) => {
     setCoins([])
     setOrder(ord)
     setMyRefreshing(true)
     setPage(1)
     getCoinsAPI(true, ord, 1)
-  })
+  }, [getCoinsAPI])
   const handleColor = useCallback(() => {
     const list = ['None', 'id_asc', 'id_desc', 'volume_desc', 'volume_asc', 'market_cap_desc', 'market_cap_asc']
     return list.indexOf(order)
   }, [order])
-  const handleOnPress = () => {
+  const handleOnPress = useCallback(() => {
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: ['Cancel', 'ID_A-Z', 'ID_Z-A', 'Volume_DESC', 'Volume_ASC', 'MCap_DESC', 'MCap_ASC'],
@@ -111,11 +112,11 @@ export default function App() {
         }
       },
     )
-  }
+  }, [handleColor, handleOrder])
   const handleTitleOnPress = useCallback(() => {
     if (order === 'volume_desc') handleOrder('volume_asc')
     else handleOrder('volume_desc')
-  }, [order])
+  }, [order, handleOrder])
 
   //------------
 
