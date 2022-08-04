@@ -5,6 +5,7 @@
     },
     "extends": [
         "plugin:react/recommended",
+        "plugin:react-hooks/recommended",
         "airbnb"
     ],
     "parserOptions": {
@@ -24,7 +25,7 @@
         "no-use-before-define": "off",
         "react/jsx-one-expression-per-line": "off",
         "object-curly-newline": "off",
-        "no-nested-ternary": "off"
-        // "no-nested-ternary": "warn"
+        "no-nested-ternary": "off",
+        "no-else-return": "warn"
     }
 }
