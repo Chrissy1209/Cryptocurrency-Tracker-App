@@ -3,9 +3,9 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 
 const handleVolume = (e) => {
   if (e > 1_000_000_000_000) return `${Math.floor(e / 1_000_000_000_000)} T`
-  else if (e > 1_000_000_000) return `${Math.floor(e / 1_000_000_000)} B`
-  else if (e > 1_000_000) return `${Math.floor(e / 1_000_000)} M`
-  else if (e > 1_000) return `${Math.floor(e / 1_000)} K`
+  if (e > 1_000_000_000) return `${Math.floor(e / 1_000_000_000)} B`
+  if (e > 1_000_000) return `${Math.floor(e / 1_000_000)} M`
+  if (e > 1_000) return `${Math.floor(e / 1_000)} K`
   return e
 }
 
