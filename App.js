@@ -10,7 +10,7 @@ const renderEmpty = React.memo(() => (
 ))
 
 export default function App() {
-  const per_page = 25
+  const perPage = 25
   const [coins, setCoins] = useState([])
   const [order, setOrder] = useState('market_cap_desc')
   const [page, setPage] = useState(1)
@@ -26,12 +26,14 @@ export default function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toggle]);
 
+  //------------
+
   const getCoinsAPI = useCallback((refresh, ord, p) => {
     const getingCoinsAPI = async () => (
-      fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=${ord}&per_page=${per_page}&page=${p}`)
+      fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=${ord}&per_page=${perPage}&page=${p}`)
         .then((response) => response.json())
         .then((myList) => {
-          console.log(myList.map((item) => item.symbol));
+          console.log(myList.map((item) => item.symbol))
           if (myList.length < 25) setEnableLoad(false)
 
           if (refresh) setCoins(myList)
@@ -52,13 +54,13 @@ export default function App() {
     const Myname = `sort-${ord}`
     return <FontAwesome5 name={Myname} size={14} color="black" />
   }, [])
-  const renderFooter = () => (
+  const renderFooter = useCallback(() => (
     myLoading && enableLoad ? (
       <View style={styles.footer}>
         <ActivityIndicator size="large" />
       </View>
     ) : null
-  )
+  ), [myLoading, enableLoad])
 
   //------------
 
